@@ -129,6 +129,7 @@ def process_entries(colormap):
     legends = to_list(colormap["Legend"]["LegendEntry"])
     colors = []
     values = []
+    ticks = []
     tooltips = []
     matches = []
 
@@ -151,7 +152,8 @@ def process_entries(colormap):
                 if (map_type == "continuous") or (map_type == "discrete"):
                     matches += [entry["@rgb"]]
         tooltips += [tooltip]
-
+        if "@showTick" in legend:
+            ticks.append(index)
         if (map_type == "continuous") or (map_type == "discrete"):
             items = re.sub(r"[\(\)\[\]]", "", entry["@value"]).split(",")
             try:
@@ -178,7 +180,8 @@ def process_entries(colormap):
         "legend": {
             "tooltips": tooltips,
             "colors": colors,
-            "type": map_type
+            "type": map_type,
+            "ticks": ticks
         }
     }
     if (map_type == "continuous") or (map_type == "discrete"):

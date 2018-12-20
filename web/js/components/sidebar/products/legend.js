@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import util from '../../../util/util';
-import { drawPaletteOnCanvas } from '../../../palettes/util';
+import { drawPaletteOnCanvas, drawTicksOnCanvas } from '../../../palettes/util';
 import lodashIsEqual from 'lodash/isEqual';
 import lodashIsNumber from 'lodash/isNumber';
 
@@ -134,37 +134,23 @@ class Legend extends React.Component {
             // This value is needed for calculating running data offsets
             this.setState({ width: newWidth });
           }
+          let ctx = this[ctxStr].current.getContext('2d');
           drawPaletteOnCanvas(
-            this[ctxStr].current.getContext('2d'),
+            ctx,
             checkerBoardPattern,
             colorMap.colors,
+            width,
+            height
+          );
+          drawTicksOnCanvas(
+            ctx,
+            colorMap,
             width,
             height
           );
         }
       }
     });
-  }
-  /**
-   * Redraw canvas with selected colormap
-   * @param {*} ctxStr | String of wanted cavnas
-   * @param {*} checkerBoardPattern | Background for canvas threshold
-   * @param {*} colors | array of color values
-   */
-  drawOnCanvas(ctx, checkerBoardPattern, colors) {
-    const { height, width } = this.props;
-    ctx.fillStyle = checkerBoardPattern;
-    ctx.fillRect(0, 0, width, height);
-
-    if (colors) {
-      var bins = colors.length;
-      var binWidth = width / bins;
-      var drawWidth = Math.ceil(binWidth);
-      colors.forEach((color, i) => {
-        ctx.fillStyle = util.hexToRGBA(color);
-        ctx.fillRect(Math.floor(binWidth * i), 0, drawWidth, height);
-      });
-    }
   }
   /**
    * @param {Number} index | Selected label Index

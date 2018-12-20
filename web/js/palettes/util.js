@@ -45,14 +45,31 @@ export function drawPaletteOnCanvas(
 ) {
   ctx.fillStyle = checkerBoardPattern;
   ctx.fillRect(0, 0, width, height);
-
   if (colors) {
-    var bins = colors.length;
-    var binWidth = width / bins;
-    var drawWidth = Math.ceil(binWidth);
+    const bins = colors.length;
+    const binWidth = width / bins;
+    const drawWidth = Math.ceil(binWidth);
     colors.forEach((color, i) => {
+      const start = Math.floor(binWidth * i);
       ctx.fillStyle = util.hexToRGBA(color);
-      ctx.fillRect(Math.floor(binWidth * i), 0, drawWidth, height);
+      ctx.fillRect(start, 0, drawWidth, height);
+    });
+  }
+}
+export function drawTicksOnCanvas(ctx, legend, width, height) {
+  const ticks = legend.ticks;
+  const colors = legend.colors;
+  const bins = colors.length;
+  const binWidth = width / bins;
+  const yValue = height * 0.5;
+  const drawWidth = Math.ceil(binWidth);
+
+  if (ticks && ticks.length > 0) {
+    ticks.forEach(tick => {
+      const start = Math.floor(binWidth * tick);
+      const midpoint = start + drawWidth / 2;
+      ctx.fillStyle = util.hexToRGBA('000000ff');
+      ctx.fillRect(midpoint - 0.25, yValue, 0.5, height);
     });
   }
 }
