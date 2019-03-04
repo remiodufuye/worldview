@@ -45,6 +45,7 @@ export function drawPaletteOnCanvas(
 ) {
   ctx.fillStyle = checkerBoardPattern;
   ctx.fillRect(0, 0, width, height);
+
   if (colors) {
     const bins = colors.length;
     const binWidth = width / bins;
@@ -64,7 +65,7 @@ export function drawTicksOnCanvas(ctx, legend, width, height) {
   const yValue = height * 0.5;
   const drawWidth = Math.ceil(binWidth);
 
-  if (ticks && ticks.length > 0) {
+  if (legend.type === 'continuous' && ticks && ticks.length > 0) {
     ticks.forEach(tick => {
       const start = Math.floor(binWidth * tick);
       const midpoint = start + drawWidth / 2;
