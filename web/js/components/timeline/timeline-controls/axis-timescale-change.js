@@ -1,15 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import AxisTimeScaleChangeControls from './axis-timescale-change-controls';
-
-const timeScaleToNumberKey = {
-  'custom': 0,
-  'year': 1,
-  'month': 2,
-  'day': 3,
-  'hour': 4,
-  'minute': 5
-};
+import { timeScaleToNumberKey } from '../constants';
 
 /*
  * Parent element for timeScale change controls and tooltip

@@ -4,23 +4,25 @@ import ReactDOM from 'react-dom';
 import googleTagManager from 'googleTagManager';
 import Timeline from '../components/timeline/timeline';
 
-const timeScaleFromNumberKey = {
-  '0': 'custom',
-  '1': 'year',
-  '2': 'month',
-  '3': 'day',
-  '4': 'hour',
-  '5': 'minute'
-};
+import { timeScaleFromNumberKey, timeScaleToNumberKey } from '../components/timeline/constants';
 
-const timeScaleToNumberKey = {
-  'custom': '0',
-  'year': '1',
-  'month': '2',
-  'day': '3',
-  'hour': '4',
-  'minute': '5'
-};
+// const timeScaleFromNumberKey = {
+//   '0': 'custom',
+//   '1': 'year',
+//   '2': 'month',
+//   '3': 'day',
+//   '4': 'hour',
+//   '5': 'minute'
+// };
+
+// const timeScaleToNumberKey = {
+//   'custom': '0',
+//   'year': '1',
+//   'month': '2',
+//   'day': '3',
+//   'hour': '4',
+//   'minute': '5'
+// };
 
 export function timeline(models, config, ui) {
   var self = {};

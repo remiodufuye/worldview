@@ -1,44 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
 import moment from 'moment';
 
-import TimeScaleIntervalChange from './timeline-controls/interval-timescale-change';
 import './timeline.css';
+import TimeScaleIntervalChange from './timeline-controls/interval-timescale-change';
 import TimelineAxis from './timeline-axis/timeline-axis';
 import CustomIntervalSelectorWidget from './interval-selector/interval-selector';
-
 import DateSelector from '../date-selector/date-selector';
 import DateChangeArrows from './timeline-controls/date-change-arrows';
 import AnimationButton from './timeline-controls/animation-button';
-
 import AxisTimeScaleChange from './timeline-controls/axis-timescale-change';
 
-// const timeUnitAbbreviations = {
-//   year: 'year',
-//   month: 'mon',
-//   day: 'day',
-//   hour: 'hour',
-//   minute: 'min'
-// };
-
-const timeScaleFromNumberKey = {
-  '0': 'custom',
-  '1': 'year',
-  '2': 'month',
-  '3': 'day',
-  '4': 'hour',
-  '5': 'minute'
-};
-
-const timeScaleToNumberKey = {
-  'custom': '0',
-  'year': '1',
-  'month': '2',
-  'day': '3',
-  'hour': '4',
-  'minute': '5'
-};
+import { timeScaleFromNumberKey } from './constants';
 
 class Timeline extends React.Component {
   constructor(props) {
