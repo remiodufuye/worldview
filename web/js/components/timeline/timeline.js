@@ -46,8 +46,6 @@ class Timeline extends React.Component {
     this.state = {
       customSelected: '',
       compareModeActive: '',
-      dateFormatted: '',
-      dateFormattedB: '',
       axisWidth: '',
       selectedDate: '',
       changeDate: '',
@@ -114,17 +112,17 @@ class Timeline extends React.Component {
   // checkLeftArrowDisabled
   checkLeftArrowDisabled = () => {
     let { draggerSelected,
-        dateFormatted,
-        dateFormattedB,
+        selectedDate,
+        selectedDateB,
         intervalChangeAmt,
         timeScaleChangeUnit,
         timelineStartDateLimit } = this.state;
     let previousIncrementDate;
     if (intervalChangeAmt && timeScaleChangeUnit) {
       if (draggerSelected === 'selected') {
-        previousIncrementDate = moment.utc(dateFormatted).subtract(intervalChangeAmt, timeScaleChangeUnit);
+        previousIncrementDate = moment.utc(selectedDate).subtract(intervalChangeAmt, timeScaleChangeUnit);
       } else {
-        previousIncrementDate = moment.utc(dateFormattedB).subtract(intervalChangeAmt, timeScaleChangeUnit);
+        previousIncrementDate = moment.utc(selectedDateB).subtract(intervalChangeAmt, timeScaleChangeUnit);
       }
       this.setState({
         leftArrowDisabled: previousIncrementDate.isSameOrBefore(timelineStartDateLimit)
@@ -135,17 +133,17 @@ class Timeline extends React.Component {
   // checkRightArrowDisabled
   checkRightArrowDisabled = () => {
     let { draggerSelected,
-      dateFormatted,
-      dateFormattedB,
+      selectedDate,
+      selectedDateB,
       intervalChangeAmt,
       timeScaleChangeUnit,
       timelineEndDateLimit } = this.state;
     let nextIncrementDate;
     if (intervalChangeAmt && timeScaleChangeUnit) {
       if (draggerSelected === 'selected') {
-        nextIncrementDate = moment.utc(dateFormatted).add(intervalChangeAmt, timeScaleChangeUnit);
+        nextIncrementDate = moment.utc(selectedDate).add(intervalChangeAmt, timeScaleChangeUnit);
       } else {
-        nextIncrementDate = moment.utc(dateFormattedB).add(intervalChangeAmt, timeScaleChangeUnit);
+        nextIncrementDate = moment.utc(selectedDateB).add(intervalChangeAmt, timeScaleChangeUnit);
       }
       this.setState({
         rightArrowDisabled: nextIncrementDate.isSameOrAfter(timelineEndDateLimit)
@@ -172,11 +170,10 @@ class Timeline extends React.Component {
   init = () => {
     // let timeScaleChangeUnitString = `${this.props.intervalDelta} ${timeUnitAbbreviations[this.props.intervalTimeScale]}`;
     this.setState({
-      dateFormatted: this.props.selectedDate.toISOString(),
-      dateFormattedB: this.props.selectedDateB ? this.props.selectedDateB.toISOString() : null,
       draggerSelected: this.props.draggerSelected,
       axisWidth: this.props.axisWidth,
-      selectedDate: this.props.selectedDate.toISOString(),
+      selectedDate: this.props.selectedDate,
+      selectedDateB: this.props.selectedDateB,
       changeDate: this.props.changeDate,
       timeScale: this.props.timeScale,
       incrementDate: this.props.incrementDate,
@@ -204,10 +201,10 @@ class Timeline extends React.Component {
   // }
 
   componentDidUpdate(prevProps, prevState) {
-    let { intervalChangeAmt, timeScaleChangeUnit, draggerSelected, dateFormatted, dateFormattedB } = this.state;
+    let { intervalChangeAmt, timeScaleChangeUnit, draggerSelected, selectedDate, selectedDateB } = this.state;
     if ((intervalChangeAmt !== prevState.intervalChangeAmt || timeScaleChangeUnit !== prevState.timeScaleChangeUnit)
-     || (draggerSelected === 'selected' && dateFormatted !== prevState.dateFormatted)
-     || (draggerSelected === 'selectedB' && dateFormattedB !== prevState.dateFormattedB)
+     || (draggerSelected === 'selected' && selectedDate !== prevState.selectedDate)
+     || (draggerSelected === 'selectedB' && selectedDateB !== prevState.selectedDateB)
      || (draggerSelected !== prevState.draggerSelected)) {
         this.checkLeftArrowDisabled();
         this.checkRightArrowDisabled();
@@ -215,17 +212,16 @@ class Timeline extends React.Component {
   }
 
   render() {
-    // console.log(this.state.selectedDate, this.state.dateFormatted)
     return (
-      this.state.dateFormatted ?
+      this.state.selectedDate ?
       <React.Fragment>
         <div id="timeline-header" className={this.state.hasSubdailyLayers ? 'subdaily' : ''}>
           <div id="date-selector-main">
             <DateSelector
               {...this.props}
               onDateChange={this.updateDate}
-              date={new Date(this.state.dateFormatted)}
-              dateB={new Date(this.state.dateFormattedB)}
+              date={new Date(this.state.selectedDate)}
+              dateB={new Date(this.state.selectedDateB)}
               hasSubdailyLayers={this.state.hasSubdailyLayers}
               draggerSelected={this.state.draggerSelected}
             />
@@ -259,8 +255,8 @@ class Timeline extends React.Component {
           <TimelineAxis
             {...this.state}
             axisWidth={this.state.axisWidth}
-            selectedDate={this.state.dateFormatted}
-            selectedDateB={this.state.dateFormattedB}
+            selectedDate={this.state.selectedDate}
+            selectedDateB={this.state.selectedDateB}
             updateDate={this.updateDate}
             hasSubdailyLayers={this.state.hasSubdailyLayers}
             parentOffset={this.state.parentOffset}
@@ -299,11 +295,7 @@ class Timeline extends React.Component {
 
         {/* 🍔 Open/Close Chevron 🍔 */}
         <div id="timeline-hide" onClick={this.toggleHideTimeline}>
-          {/* {this.state.timelineHidden ? */}
           <div className={`wv-timeline-hide wv-timeline-hide-double-chevron-${this.state.timelineHidden ? 'left' : 'right'}`}></div>
-          {/* : */}
-          {/* <div className="wv-timeline-hide wv-timeline-hide-double-chevron-right"></div> */}
-          {/* } */}
         </div>
       </React.Fragment>
       :

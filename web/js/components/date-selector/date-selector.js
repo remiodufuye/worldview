@@ -27,7 +27,6 @@ class DateSelector extends React.Component {
   }
   componentWillReceiveProps(props) {
     this.setState({
-      // date: props.draggerSelectedB ? props.dateB : props.date,
       date: props.draggerSelected === 'selectedB' ? props.dateB : props.date,
       maxDate: props.maxDate,
       minDate: props.minDate,
@@ -65,11 +64,9 @@ class DateSelector extends React.Component {
     });
   }
   updateDate(date, type, amt) {
-    // console.log(this.state.date)
     this.setState({
       date: date
     });
-    // this.props.onDateChange(date, this.props.id, type, amt);
     // # allows dragger change via main date selector, and id change via anim date selectors
     this.props.onDateChange(date, this.props.draggerSelected || this.props.id);
   }
@@ -124,8 +121,6 @@ class DateSelector extends React.Component {
     }
   }
   render() {
-    // console.log(this.props.date)
-    // console.log(this.props.draggerSelected === 'selected')
     return (
       <div className="wv-date-selector-widget">
         <DateInputColumn

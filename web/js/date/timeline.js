@@ -188,11 +188,6 @@ export function timeline(models, config, ui) {
     left: 30
   };
 
-  self.getPadding = function() {
-    self.padding = self.width / 4;
-    return self.padding;
-  };
-
   self.getWidth = function() {
     // check for compare mode
     let isCompareModeActive = models.compare.active;
@@ -223,9 +218,12 @@ export function timeline(models, config, ui) {
 
   self.toggle = function(now) {
     var tl = $('#timeline-footer');
+    const timelineFooter = document.querySelector('#timeline-footer');
+    const timeline = document.querySelector('#timeline');
     // var tlg = self.boundary;
     // var gp = d3.select('#guitarpick');
-    if (tl.is(':hidden')) {
+    let isTimelineHidden = timelineFooter.style.display === 'none';
+    if (isTimelineHidden) {
       var afterShow = function() {
         // tlg.attr('style', 'clip-path:url("#timeline-boundary")');
         // gp.attr('style', 'clip-path:url(#guitarpick-boundary);');
@@ -236,62 +234,47 @@ export function timeline(models, config, ui) {
       } else {
         tl.show('slow', afterShow);
       }
-      $('#timeline').removeClass('closed');
+      timeline.classList.remove('closed');
     } else {
       // tlg.attr('style', 'clip-path:none');
       // gp.attr('style', 'display:none;clip-path:none');
       tl.hide('slow');
-      $('#timeline').addClass('closed');
+      timeline.classList.add('closed');
     }
   };
 
   self.expand = function(now) {
     now = now || false;
-    var tl = $('#timeline-footer');
-    if (tl.is(':hidden')) {
+    const timelineFooter = document.querySelector('#timeline-footer');
+    let isTimelineHidden = timelineFooter.style.display === 'none';
+    if (isTimelineHidden) {
       self.toggle(now);
     }
   };
 
   self.collapse = function(now) {
     now = now || false;
-    var tl = $('#timeline-footer');
-    if (!tl.is(':hidden')) {
+    const timelineFooter = document.querySelector('#timeline-footer');
+    let isTimelineHidden = timelineFooter.style.display === 'none';
+    if (!isTimelineHidden) {
       self.toggle(now);
     }
   };
 
   self.resize = function() {
     var small = util.browser.small || util.browser.constrained;
+    const timeline = document.querySelector('#timeline');
     if (self.enabled && small) {
       self.enabled = false;
-      $('#timeline').hide();
+      timeline.style.display = 'none';
+
     } else if (!self.enabled && !small) {
       self.enabled = true;
-      $('#timeline').show();
+      timeline.style.display = 'flex';
     }
 
     if (self.enabled) {
       self.getWidth();
-
-    //   self.svg
-    //     .attr('width', self.width)
-    //     .attr(
-    //       'viewBox',
-    //       '0 9 ' +
-    //         self.width +
-    //         ' ' +
-    //         (self.height + self.margin.top + self.margin.bottom + 26)
-    //     );
-
-    //   d3.select('#timeline-boundary rect').attr('width', self.width);
-
-    //   d3.select('#guitarpick-boundary rect').attr(
-    //     'width',
-    //     self.width + self.margin.left + self.margin.right
-    //   );
-
-    //   self.axis.select('line:first-child').attr('x2', self.width);
     }
     self.reactComponent.setState({
       axisWidth: self.getWidth(),
@@ -344,11 +327,10 @@ export function timeline(models, config, ui) {
 
       // default 7 timeScale units away for B dragger if not selected at compare init
       let selectedDateB = models.date.selectedB ? models.date.selectedB : util.dateAdd(selectedDate, selectedTimeScale, -7);
-      let dateFormattedB = new Date(selectedDateB).toISOString();
+      let selectedDateBFormatted = new Date(selectedDateB).toISOString();
       self.reactComponent.setState({
         compareModeActive: isCompareModeActive,
-        selectedDateB: selectedDateB,
-        dateFormattedB: dateFormattedB,
+        selectedDateB: selectedDateBFormatted,
         axisWidth: self.width,
         parentOffset: self.parentOffset,
         hasSubdailyLayers: hasSubDaily
@@ -382,26 +364,23 @@ export function timeline(models, config, ui) {
   var setIntervalInput = (intervalValue, zoomLevel) => {
     models.date.setCustomInterval(intervalValue, timeScaleToNumberKey[zoomLevel]);
     let zoomCustomText = document.querySelector('#zoom-custom');
-    // zoomCustomText.textContent = `${intervalValue} ${zoomLevel.toUpperCase().substr(0, 3)}`;
     zoomCustomText.textContent = `${intervalValue} ${zoomLevel.toUpperCase()}`;
-    // model.events.trigger('zoom-change');
     self.reactComponent.setState({
       timeScaleChangeUnit: zoomLevel,
       customIntervalValue: intervalValue,
       customIntervalZoomLevel: zoomLevel,
-      intervalChangeAmt: intervalValue,
-      // customIntervalModalOpen: false
+      intervalChangeAmt: intervalValue
     });
   };
 
   // set selected interval either custom or standard delta of 1
-  var setSelectedInterval = (interval, intervalChangeAmt, customSelected, openDialog) => {
+  var setSelectedInterval = (interval, intervalChangeAmt, customSelected, customIntervalModalOpen) => {
     models.date.setSelectedInterval(timeScaleToNumberKey[interval], customSelected);
     self.reactComponent.setState({
       timeScaleChangeUnit: interval,
       customSelected: customSelected,
       intervalChangeAmt: intervalChangeAmt,
-      customIntervalModalOpen: openDialog
+      customIntervalModalOpen: customIntervalModalOpen
     });
   };
 
@@ -476,8 +455,8 @@ export function timeline(models, config, ui) {
     let selectedDate = models.date.selected;
     let selectedDateB = models.date.selectedB ? models.date.selectedB : null;
     // TODO: date formatted props necessary in dev to handle model.select date rounding - remove now?
-    let dateFormatted = selectedDate ? new Date(selectedDate).toISOString() : '';
-    let dateFormattedB = selectedDateB ? new Date(selectedDateB).toISOString() : '';
+    let selectedDateFormatted = selectedDate ? new Date(selectedDate).toISOString() : '';
+    let selectedDateBFormatted = selectedDateB ? new Date(selectedDateB).toISOString() : '';
     let timelineStartDateLimit = config.startDate;
     let timelineEndDateLimit = models.layers.lastDate().toISOString();
 
@@ -492,9 +471,6 @@ export function timeline(models, config, ui) {
     let animStartLocationDate = models.anim.rangeState.startDate;
     let animEndLocationDate = models.anim.rangeState.endDate;
     let isAnimationWidgetOpen = models.anim.rangeState.state === 'on';
-    // console.log(animStartLocationDate, animEndLocationDate)
-
-    // console.log(models.anim.rangeState.state)
 
     // get separate input props
     // TODO: combined props cleaner or too long?
@@ -508,16 +484,14 @@ export function timeline(models, config, ui) {
       parentOffset: self.parentOffset,
       hasSubdailyLayers: subdaily,
       timelineHeight: self.height,
-      selectedDate: selectedDate,
-      selectedDateB: selectedDateB,
+      selectedDate: selectedDateFormatted,
+      selectedDateB: selectedDateBFormatted,
       timelineStartDateLimit: timelineStartDateLimit,
       timelineEndDateLimit: timelineEndDateLimit,
       timeScale: selectedTimeScale,
       incrementDate: incrementDate,
       updateDate: updateDate,
       setIntervalInput: setIntervalInput,
-      dateFormatted: dateFormatted,
-      dateFormattedB: dateFormattedB,
       stopper: stopper,
       clickAnimationButton: clickAnimationButton,
       toggleHideTimeline: self.toggle,
@@ -540,88 +514,27 @@ export function timeline(models, config, ui) {
       React.createElement(Timeline, initialProps),
       document.getElementById('timeline')
     );
-
-    // self.svg = d3
-    //   .select('#timeline-footer')
-    //   .append('svg:svg')
-    //   .attr('width', self.width) // + margin.left + margin.right)
-    //   .attr('height', self.height + self.margin.top + self.margin.bottom + 42)
-    //   .attr('id', 'timeline-footer-svg')
-    //   .attr(
-    //     'viewBox',
-    //     '0 9 ' +
-    //       self.width +
-    //       ' ' +
-    //       (self.height + self.margin.top + self.margin.bottom + 26)
-    //   );
-
-    // self.svg
-    //   .append('svg:defs')
-    //   .append('svg:clipPath')
-    //   .attr('id', 'timeline-boundary')
-    //   .append('svg:rect')
-    //   .attr('width', self.width) // + margin.left + margin.right)
-    //   .attr('height', self.height + self.margin.top + self.margin.bottom);
-
-    // d3.select('#timeline-footer svg defs')
-    //   .append('svg:clipPath')
-    //   .attr('id', 'guitarpick-boundary')
-    //   .append('svg:rect')
-    //   .attr('width', self.width + self.margin.left + self.margin.right) // + margin.left + margin.right)
-    //   .attr('height', self.height + self.margin.top + self.margin.bottom)
-    //   .attr('x', -self.margin.left);
-
-    // self.boundary = self.svg
-    //   .append('svg:g')
-    //   .attr('clip-path', 'url(#timeline-boundary)')
-    //   .attr('style', 'clip-path:url(#timeline-boundary)')
-    //   .attr('transform', 'translate(0,1)');
-
-    // self.axis = self.boundary
-    //   .append('svg:g')
-    //   .attr('class', 'x axis')
-    //   .attr('transform', 'translate(0,' + self.height + ')');
-
-    // self.axis
-    //   .insert('line', ':first-child')
-    //   .attr('x1', 0)
-    //   .attr('x2', self.width); // +margin.left+margin.right);
-
-    // self.dataBars = self.boundary
-    //   .insert('svg:g', '.x.axis')
-    //   .attr('height', self.height)
-    //   .classed('plot', true);
-
-    // self.verticalAxis = self.boundary
-    //   .append('svg:g')
-    //   .attr('class', 'y axis')
-    //   .attr('transform', 'translate(0,0)');
-    // self.animboundary = self.svg
-    //   .append('svg:g')
-    //   .attr('clip-path', '#timeline-boundary')
-    //   .attr('transform', 'translate(0,16)');
-    // self.animboundary.append('g').attr('id', 'wv-rangeselector-case');
   };
 
-  // arguments passed as date (date object) and selectionStr ('selected' or 'selectedB')
+  // Update date within React component
+  // FROM LISTENER
   var updateReactTimelineDate = function(date, selectionStr) {
     let selectedDate = models.date.selected;
     let selectedDateB = models.date.selectedB;
     let draggerSelected = models.date.activeDate;
 
-    let dateFormatted = selectedDate ? new Date(selectedDate).toISOString() : '';
-    let dateFormattedB = selectedDateB ? new Date(selectedDateB).toISOString() : '';
+    let selectedDateFormatted = selectedDate ? new Date(selectedDate).toISOString() : '';
+    let selectedDateBFormatted = selectedDateB ? new Date(selectedDateB).toISOString() : '';
 
     self.reactComponent.setState({
-      selectedDate: selectedDate,
-      dateFormatted: dateFormatted,
+      selectedDate: selectedDateFormatted,
       draggerSelected: draggerSelected,
-      selectedDateB: selectedDateB,
-      dateFormattedB: dateFormattedB
+      selectedDateB: selectedDateBFormatted
     });
   };
 
   // Update status of subdaily layers being in sidebar
+  // child of FROM LISTENER
   var updateSubdailyState = function() {
     // check for compare mode
     let isCompareModeActive = models.compare.active;
@@ -647,13 +560,14 @@ export function timeline(models, config, ui) {
     }
   };
 
+  // layer update FROM LISTENER
   var onLayerUpdate = function() {
-    // self.data.set();
     self.resize();
     ui.anim.widget.update();
     updateSubdailyState();
   };
 
+  // animation date change FROM LISTENER
   var onAnimationDateChange = () => {
     let animationStartLocationDate = models.anim.rangeState.startDate;
     let animationEndLocationDate = models.anim.rangeState.endDate;
@@ -664,6 +578,7 @@ export function timeline(models, config, ui) {
     });
   };
 
+  // toggle animation widget FROM LISTENER
   var onAnimationWidgetToggle = () => {
     let animationStartLocationDate = models.anim.rangeState.startDate;
     let animationEndLocationDate = models.anim.rangeState.endDate;
@@ -676,40 +591,22 @@ export function timeline(models, config, ui) {
     });
   };
 
+  // initialization on load - CONTAINER ADDED TO DOM HERE
   var init = function() {
-    var $timelineFooter = $('#timeline-footer');
     models.layers.events.trigger('toggle-subdaily');
-
-    // check for compare mode
-    let isCompareModeActive = models.compare.active;
-
-    // if compare mode is active, check for subdaily in either A or B
-    if (isCompareModeActive) {
-      subdaily = models.layers.hasSubDaily('active') || models.layers.hasSubDaily('activeB');
-    } else {
-      subdaily = models.layers.hasSubDaily();
-    }
 
     drawContainers();
     initInput();
 
-    $('#zoom-custom').on('click', function() {
+    document.querySelector('#zoom-custom').addEventListener('click', function() {
       self.reactComponent.setState({
         customIntervalModalOpen: true
       });
     });
 
+    // hide animation button if feature not used
     if (!models.anim) {
-      // Hack: margin if anim is present
-      $('#animate-button').hide();
-      $timelineFooter.css('margin-left', self.margin.left - 1 + 'px');
-      $timelineFooter.css('margin-right', self.margin.right - 1 + 'px');
-    } else {
-      $timelineFooter.css('margin-left', '0');
-      $timelineFooter.css(
-        'margin-right',
-        self.margin.right + self.margin.left - 32 + 'px'
-      );
+      document.querySelector('#animate-button').style.display = 'none';
     }
 
     self.resize();
@@ -726,7 +623,7 @@ export function timeline(models, config, ui) {
     //   });
     //   self.toggle();
     // });
-
+// ! USE REDUX
     $(window).resize(function() {
       self.resize();
       // self.zoom.refresh();

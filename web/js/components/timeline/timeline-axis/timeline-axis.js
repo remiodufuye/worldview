@@ -759,7 +759,6 @@ class TimelineAxis extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    // console.log(prevProps.selectedDate, this.props.selectedDate, this.state.selectedDate, prevState.selectedDate)
     if (!this.state.isAnimationDraggerDragging) {
       if (this.props.animStartLocationDate !== prevProps.animStartLocationDate ||
         this.props.animEndLocationDate !== prevProps.animEndLocationDate) {
@@ -811,7 +810,6 @@ class TimelineAxis extends React.Component {
 
     if(!this.state.isDraggerDragging) {
       // # HANDLE A DRAGGER CHANGE
-      // console.log(this.props.selectedDate, prevProps.selectedDate, this.state.draggerTimeState, prevState.draggerTimeState, this.props.selectedDate, prevProps.selectedDate, this.state.draggerTimeState, prevState.draggerTimeState, moment.utc(this.state.draggerTimeState).format(), moment.utc(prevState.draggerTimeState).format())
       if (this.props.selectedDate && (this.props.selectedDate !== prevProps.selectedDate ||
         this.state.draggerTimeState !== prevState.draggerTimeState ||
         moment.utc(this.state.draggerTimeState).format() !== moment.utc(prevState.draggerTimeState).format())) {
@@ -1084,7 +1082,7 @@ class TimelineAxis extends React.Component {
 
         if (draggerASelected) {
           // prevent function invoke on dragger click, but no date change
-          if (moment.utc(this.props.dateFormatted).format() !== newDraggerTime) {
+          if (moment.utc(this.props.selectedDate).format() !== newDraggerTime) {
             this.setState({
               draggerPosition: draggerPosition,
               draggerTimeState: newDraggerTime,
@@ -1093,7 +1091,7 @@ class TimelineAxis extends React.Component {
           }
         } else {
           // prevent function invoke on dragger click, but no date change
-          if (moment.utc(this.props.dateFormattedB).format() !== newDraggerTime) {
+          if (moment.utc(this.props.selectedDateB).format() !== newDraggerTime) {
             this.setState({
               draggerPositionB: draggerPosition,
               draggerTimeStateB: newDraggerTime,
