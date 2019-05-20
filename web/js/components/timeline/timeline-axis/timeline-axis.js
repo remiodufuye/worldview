@@ -706,13 +706,15 @@ class TimelineAxis extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    // update animation draggers from date selector input changes
     if (!this.state.isAnimationDraggerDragging) {
       if (this.props.animStartLocationDate !== prevProps.animStartLocationDate ||
         this.props.animEndLocationDate !== prevProps.animEndLocationDate) {
       this.animationDraggerDateUpdate(this.props.animStartLocationDate, this.props.animEndLocationDate)
-    }
+      }
     }
 
+    // update timescale axis focus
     if (this.props.timeScale !== prevProps.timeScale) {
       let draggerDate;
       let leftOffset;
@@ -729,14 +731,14 @@ class TimelineAxis extends React.Component {
       this.updateScale(draggerDate, this.props.timeScale, null, leftOffset, true);
     }
 
+    // update axis on browser width change
     if (this.props.axisWidth !== prevProps.axisWidth) {
       this.updateScale(null, this.props.timeScale, this.props.axisWidth);
     }
 
+    // handle compare mode toggle change
     if (this.props.compareModeActive !== prevProps.compareModeActive) {
       // TURN ON COMPARE MODE
-      // determine what dragger is selected/active at the time of turning on
-      // and set date and visibility
       if (this.props.compareModeActive) {
         this.setDraggerToTime(this.props.selectedDate);
         this.setDraggerToTime(this.props.selectedDateB, true);
@@ -755,8 +757,25 @@ class TimelineAxis extends React.Component {
       }
     }
 
+    // handle switching A/B dragger axis focus if switched from A/B sidebar tabs
+    if (this.props.compareModeActive && (this.props.draggerSelected !== prevProps.draggerSelected)) {
+      if (this.props.draggerSelected === 'selected') {
+        let newDraggerDate = this.checkDraggerMoveOrUpdateScale(this.props.selectedDate);
+        if (!newDraggerDate.withinRange) {
+          let leftOffsetFixedCoeff = newDraggerDate.newDraggerDiff > 5 ? 0.5 : newDraggerDate.newDateInThePast ? 0.25 : 0.75;
+          this.updateScale(this.props.selectedDate, this.props.timeScale, null, leftOffsetFixedCoeff);
+        }
+      } else {
+        let newDraggerDate = this.checkDraggerMoveOrUpdateScale(this.props.selectedDateB, true);
+        if (!newDraggerDate.withinRange) {
+          let leftOffsetFixedCoeff = newDraggerDate.newDraggerDiff > 5 ? 0.5 : newDraggerDate.newDateInThePast ? 0.25 : 0.75;
+          this.updateScale(this.props.selectedDateB, this.props.timeScale, null, leftOffsetFixedCoeff);
+        }
+      }
+    }
+
     if(!this.state.isDraggerDragging) {
-      // # HANDLE A DRAGGER CHANGE
+      // handle A dragger change
       if (this.props.selectedDate && (this.props.selectedDate !== prevProps.selectedDate ||
         this.state.draggerTimeState !== prevState.draggerTimeState ||
         moment.utc(this.state.draggerTimeState).format() !== moment.utc(prevState.draggerTimeState).format())) {
@@ -775,7 +794,7 @@ class TimelineAxis extends React.Component {
         }
       }
 
-      // # HANDLE B DRAGGER CHANGE
+      // handle B dragger change
       if (this.props.selectedDateB && (this.props.selectedDateB !== prevProps.selectedDateB ||
         this.state.draggerTimeStateB !== prevState.draggerTimeStateB ||
         moment.utc(this.state.draggerTimeStateB).format() !== moment.utc(prevState.draggerTimeStateB).format())) {
@@ -802,9 +821,8 @@ class TimelineAxis extends React.Component {
     let frontDate = moment.utc(this.state.currentTimeRange[0].rawDate);
     let backDate = moment.utc(this.state.currentTimeRange[this.state.currentTimeRange.length - 1].rawDate);
 
-
     let draggerTime = draggerB ? this.state.draggerTimeStateB : this.state.draggerTimeState;
-    let draggerTimeState = moment.utc(draggerTime, 'YYYY-MM-DDTHH:mm:ss.SSSZ');
+    let draggerTimeState = moment.utc(draggerTime);
     let draggerTimeStateAdded = moment.utc(inputTime);
 
     let isBetween = draggerTimeStateAdded.isBetween(frontDate, backDate, null, '[]');
