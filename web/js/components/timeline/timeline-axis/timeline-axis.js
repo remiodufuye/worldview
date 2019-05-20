@@ -19,6 +19,7 @@ class TimelineAxis extends React.Component {
       draggerWidth: 49,
       hoverLinePosition: 0,
       isDraggerDragging: false,
+      isTimelineDragging: false,
       showDraggerTime: false,
       dragSentinelCount: 0,
       draggerPosition: 0,
@@ -841,6 +842,13 @@ class TimelineAxis extends React.Component {
     }
   }
 
+  // handle start drag of axis
+  handleStartDrag = () => {
+    this.setState({
+      isTimelineDragging: true
+    })
+  }
+
   // handle stop drag of axis
   // moved === false means an axis click
   handleStopDrag = (e, d) => {
@@ -862,6 +870,8 @@ class TimelineAxis extends React.Component {
     }
 
     this.setState({
+      showHoverLine: true,
+      isTimelineDragging: false,
       leftBound: leftBound,
       rightBound: rightBound,
       moved: moved,
@@ -1266,6 +1276,7 @@ class TimelineAxis extends React.Component {
           axis="x"
           onDrag={this.handleDrag.bind(this)}
           position={{ x: this.state.position, y: 0 }}
+          onStart={this.handleStartDrag.bind(this)}
           onStop={this.handleStopDrag.bind(this)}
           bounds={{left: this.state.leftBound, top: 0, bottom: 0, right: this.state.rightBound}}
         >
@@ -1280,7 +1291,7 @@ class TimelineAxis extends React.Component {
         </g>
         </Draggable>
 
-        <line className="svgLine" style={{display: this.state.showHoverLine ? 'block' : 'none'}}
+        <line className="svgLine" style={{display: !this.state.isTimelineDragging && this.state.showHoverLine ? 'block' : 'none'}}
           stroke="blue" strokeWidth="2" strokeOpacity="0.48" x1="0" x2="0" y1="0" y2="63"
           transform={`translate(${this.state.hoverLinePosition + 1}, 0)`} shapeRendering="optimizeSpeed"/>
 
@@ -1366,7 +1377,7 @@ class TimelineAxis extends React.Component {
           className="dateToolTip"
           style={{
             transform: `translate(${draggerTimeLeftOffest}px, -100px)`,
-            display: this.state.showDraggerTime && this.state.draggerTimeState ? 'block' : 'none',
+            display: !this.state.isTimelineDragging && this.state.showDraggerTime && this.state.draggerTimeState ? 'block' : 'none',
             // opacity: this.state.showDraggerTime && this.state.draggerTimeState ? '1' : '0',
             width: this.props.hasSubdailyLayers ? '220px' : '115px'
           }}
@@ -1384,7 +1395,7 @@ class TimelineAxis extends React.Component {
           className="dateToolTip"
           style={{
             transform: `translate(${hoverTimeLeftOffset}px, -100px)`,
-            display: !this.state.showDraggerTime && this.state.showHoverLine ? 'block' : 'none',
+            display: !this.state.isTimelineDragging && !this.state.showDraggerTime && this.state.showHoverLine ? 'block' : 'none',
             // opacity: !this.state.showDraggerTime && this.state.showHoverLine ? '1' : '0',
             width: this.props.hasSubdailyLayers ? '220px' : '115px'
           }}
